@@ -10,7 +10,9 @@
 	
 	<properties>
         <project.version>0.0.2-SNAPSHOT</project.version>
-        <java.version>11</java.version>
+		<start-class>com.codeages.framework.FrameworkApplication</start-class>
+		<java.version>11</java.version>
+		<compiler.encoding>UTF-8</compiler.encoding>
     </properties>
 	
 	<dependencies>
@@ -39,6 +41,7 @@
 		</developer>
 	</developers>
 
+
 	<scm>
 		<url>https://github.com/spring-skeleton/framework-boot</url>
 		<connection>https://github.com/spring-skeleton/framework-boot.git</connection>
@@ -60,16 +63,83 @@
 
 	<build>
 		<finalName>framework-boot</finalName>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<release>11</release>
-					<encoding>UTF-8</encoding>
-				</configuration>
-			</plugin>
-
-		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<configuration>
+						<archive>
+							<manifest>
+								<addClasspath>true</addClasspath>
+								<classpathPrefix>lib/</classpathPrefix>
+								<mainClass>${start-class}</mainClass>
+							</manifest>
+							<manifestEntries>
+								<Class-Path>./config/</Class-Path>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-dependency-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>copy</id>
+							<phase>package</phase>
+							<goals>
+								<goal>copy-dependencies</goal>
+							</goals>
+							<configuration>
+								<outputDirectory>
+									./target/lib
+								</outputDirectory>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-antrun-plugin</artifactId>
+					<executions>
+						<execution>
+							<id>package</id>
+							<phase>package</phase>
+							<goals>
+								<goal>run</goal>
+							</goals>
+							<configuration>
+								<tasks>
+									<copy todir="${project.build.directory}/${project.name}/lib" overwrite="true">
+										<fileset dir="${project.build.directory}/lib">
+											<include name="*.jar"/>
+										</fileset>
+									</copy>
+									<copy todir="${project.build.directory}/${project.name}" overwrite="true">
+										<fileset dir="${project.build.directory}">
+											<include name="${project.name}.jar"/>
+										</fileset>
+									</copy>
+									<copy todir="${project.build.directory}/${project.name}/bin">
+										<fileset dir="${basedir}/bin"/>
+									</copy>
+									<mkdir dir="${project.build.directory}/${project.name}/config" />
+								</tasks>
+							</configuration>
+						</execution>
+					</executions>
+				</plugin>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<configuration>
+						<source>${java.version}</source>
+						<target>${java.version}</target>
+						<encoding>${compiler.encoding}</encoding>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
 	</build>
 </project>
