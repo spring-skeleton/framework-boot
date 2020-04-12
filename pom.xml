@@ -139,6 +139,20 @@
 						<encoding>${compiler.encoding}</encoding>
 					</configuration>
 				</plugin>
+				<plugin>
+					<groupId>com.codeages</groupId>
+					<artifactId>generate-bin</artifactId>
+					<version>1.0.0-RELEASE</version>
+					<executions>
+						<execution>
+							<id>package</id>
+							<phase>package</phase>
+							<goals>
+								<goal>generate-bin</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
 			</plugins>
 		</pluginManagement>
 	</build>
