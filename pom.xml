@@ -121,10 +121,8 @@
 											<include name="${project.name}.jar"/>
 										</fileset>
 									</copy>
-									<copy todir="${project.build.directory}/${project.name}/bin">
-										<fileset dir="${basedir}/bin"/>
-									</copy>
 									<mkdir dir="${project.build.directory}/${project.name}/config" />
+									<copy tofile="${project.build.directory}/${project.name}/config/application-prod.properties.dist" file="src/main/resources/application-dev.properties.dist" overwrite="true"></copy>
 								</tasks>
 							</configuration>
 						</execution>
@@ -138,6 +136,20 @@
 						<target>${java.version}</target>
 						<encoding>${compiler.encoding}</encoding>
 					</configuration>
+				</plugin>
+				<plugin>
+					<groupId>com.codeages</groupId>
+					<artifactId>generate-bin</artifactId>
+					<version>1.0.0-RELEASE</version>
+					<executions>
+						<execution>
+							<id>package</id>
+							<phase>package</phase>
+							<goals>
+								<goal>generate-bin</goal>
+							</goals>
+						</execution>
+					</executions>
 				</plugin>
 			</plugins>
 		</pluginManagement>
