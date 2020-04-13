@@ -121,10 +121,8 @@
 											<include name="${project.name}.jar"/>
 										</fileset>
 									</copy>
-									<copy todir="${project.build.directory}/${project.name}/bin">
-										<fileset dir="${basedir}/bin"/>
-									</copy>
 									<mkdir dir="${project.build.directory}/${project.name}/config" />
+									<copy tofile="${project.build.directory}/${project.name}/config/application-prod.properties.dist" file="src/main/resources/application-dev.properties.dist" overwrite="true"></copy>
 								</tasks>
 							</configuration>
 						</execution>
