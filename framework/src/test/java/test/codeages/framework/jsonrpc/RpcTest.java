@@ -4,11 +4,11 @@ import com.codeages.framework.jsonrpc.JsonRpcException;
 import org.junit.Assert;
 import org.junit.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import test.codeages.framework.BaseTest;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import test.codeages.framework.BaseTest;
 
 public class RpcTest extends BaseTest {
 

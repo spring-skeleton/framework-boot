@@ -5,7 +5,7 @@ import com.googlecode.junittoolbox.WildcardPatternSuite;
 import org.junit.runner.RunWith;
 
 @RunWith(WildcardPatternSuite.class)
-@SuiteClasses({"**/*Test.class", "!**/BaseTest.class"})
+@SuiteClasses({"**/*Test.class", "!**/test.codeages.framework.BaseTest.class"})
 public class TestSuites {
 
 }

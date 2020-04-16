@@ -6,13 +6,11 @@
     <parent>
         <groupId>com.codeages</groupId>
         <artifactId>framework-boot</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
+        <version>0.0.3-SNAPSHOT</version>
     </parent>
 
-    <groupId>com.codeages</groupId>
     <artifactId>framework</artifactId>
     <packaging>jar</packaging>
-    <version>${project.parent.version}</version>
     <name>${project.name}</name>
     <description>Codeages Framework for Spring Boot</description>
 
@@ -23,24 +21,8 @@
     <dependencies>
         <!-- test dependency  -->
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.restdocs</groupId>
-            <artifactId>spring-restdocs-mockmvc</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>junit</groupId>
-            <artifactId>junit</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.googlecode.junit-toolbox</groupId>
-            <artifactId>junit-toolbox</artifactId>
+            <groupId>com.codeages</groupId>
+            <artifactId>test-framework</artifactId>
         </dependency>
     </dependencies>
 
