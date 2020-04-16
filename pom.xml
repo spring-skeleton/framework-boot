@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.codeages</groupId>
 	<artifactId>framework-boot</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	
 	<properties>
@@ -14,7 +14,7 @@
 		<spring-restdocs.version>2.0.4.RELEASE</spring-restdocs.version>
 		<java.version>11</java.version>
 		<compiler.encoding>UTF-8</compiler.encoding>
-        <com.codeages.framework.version>0.0.2-SNAPSHOT</com.codeages.framework.version>
+        <com.codeages.framework.version>0.0.1-SNAPSHOT</com.codeages.framework.version>
 		<start-class>com.codeages.framework.FrameworkApplication</start-class>
     </properties>
 	
