@@ -15,6 +15,7 @@
 		<java.version>11</java.version>
 		<compiler.encoding>UTF-8</compiler.encoding>
         <com.codeages.framework.version>0.0.2-SNAPSHOT</com.codeages.framework.version>
+		<start-class>com.codeages.framework.FrameworkApplication</start-class>
     </properties>
 	
 	<dependencies>
