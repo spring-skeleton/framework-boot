@@ -9,17 +9,16 @@
 	<packaging>pom</packaging>
 	
 	<properties>
-        <project.version>0.0.1-SNAPSHOT</project.version>
-		<start-class>com.codeages.framework.FrameworkApplication</start-class>
 		<java.version>11</java.version>
 		<compiler.encoding>UTF-8</compiler.encoding>
+        <com.codeages.framework.version>0.0.1-SNAPSHOT</com.codeages.framework.version>
     </properties>
 	
 	<dependencies>
 		<dependency>
 			<groupId>com.codeages</groupId>
 			<artifactId>framework</artifactId>
-			<version>${project.version}</version>
+			<version>${com.codeages.framework.version}</version>
 		</dependency>
 	</dependencies>
 
