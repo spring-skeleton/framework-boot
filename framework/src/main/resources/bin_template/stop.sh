@@ -1,0 +1,1 @@
+curl -X POST http://localhost:${server.port}/actuator/shutdown
