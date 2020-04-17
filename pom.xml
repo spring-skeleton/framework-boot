@@ -283,6 +283,7 @@
 								<outputDirectory>
 									./target/lib
 								</outputDirectory>
+								<includeScope>runtime</includeScope>
 							</configuration>
 						</execution>
 					</executions>
@@ -296,7 +297,7 @@
 							<include>**/*Test.java</include>
 						</includes>
 						<excludes>
-							<exclude>**/test.codeages.framework.BaseTest.java</exclude>
+							<exclude>**/BaseTest.java</exclude>
 						</excludes>
 					</configuration>
 				</plugin>
