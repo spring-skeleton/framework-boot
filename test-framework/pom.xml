@@ -22,32 +22,33 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
-            <scope>compile</scope>
+            <version>2.2.4.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.junit.vintage</groupId>
+                    <artifactId>junit-vintage-engine</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>compile</scope>
+            <version>1.4.200</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.restdocs</groupId>
             <artifactId>spring-restdocs-mockmvc</artifactId>
-            <scope>compile</scope>
+            <version>${spring-restdocs.version}</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <scope>compile</scope>
+            <version>4.12</version>
         </dependency>
         <dependency>
             <groupId>com.googlecode.junit-toolbox</groupId>
             <artifactId>junit-toolbox</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-test</artifactId>
-            <scope>compile</scope>
+            <version>2.4</version>
         </dependency>
     </dependencies>
 </project>
