@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.codeages</groupId>
+        <artifactId>framework-boot</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+    </parent>
+
+    <artifactId>framework</artifactId>
+    <packaging>jar</packaging>
+    <name>${module.name}</name>
+    <description>Framework for Spring Boot</description>
+
+    <properties>
+        <module.name>framework</module.name>
+    </properties>
+
+    <dependencies>
+        <!-- test dependency  -->
+        <dependency>
+            <groupId>com.codeages</groupId>
+            <artifactId>test-framework</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${module.name}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>com.codeages</groupId>
+                <artifactId>generate-bin</artifactId>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+            </plugin>
+        </plugins>
+    </build>
+</project>
