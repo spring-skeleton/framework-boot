@@ -19,7 +19,7 @@ public class ServiceAnnotationCollector extends BaseServiceCollector {
         if (annotationMetadata.isAnnotated(annotation)) {
             String className = classMetadata.getClassName();
             Class clazz = Class.forName(className);
-            Map<String, RpcService> map = applicationContext.getBeansOfType(clazz);
+            Map<String, Object> map = applicationContext.getBeansOfType(clazz);
             map.entrySet().forEach(entry -> {
                 Object rpcService = entry.getValue();
                 Map<String, Object> annotationAttrs = annotationMetadata.getAnnotationAttributes(annotation);
