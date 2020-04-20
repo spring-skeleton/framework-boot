@@ -19,22 +19,21 @@ public class ServiceAnnotationCollector extends BaseServiceCollector {
         if (annotationMetadata.isAnnotated(annotation)) {
             String className = classMetadata.getClassName();
             Class clazz = Class.forName(className);
-            Map<String, Object> map = applicationContext.getBeansOfType(clazz);
-            map.entrySet().forEach(entry -> {
-                Object rpcService = entry.getValue();
-                Map<String, Object> annotationAttrs = annotationMetadata.getAnnotationAttributes(annotation);
+            String beanName = clazz.getSimpleName();
+            beanName = new StringBuilder().append(Character.toLowerCase(beanName.charAt(0))).append(beanName.substring(1)).toString();
+            Object rpcService = applicationContext.getBean(beanName);
+            Map<String, Object> annotationAttrs = annotationMetadata.getAnnotationAttributes(annotation);
 
-                String rpcName = annotationAttrs.get("value").toString().trim();
-                if ("".equals(rpcName)) {
-                    rpcName = clazz.getSimpleName();
-                }
+            String rpcName = annotationAttrs.get("value").toString().trim();
+            if ("".equals(rpcName)) {
+                rpcName = clazz.getSimpleName();
+            }
 
-                String beanName = rpcPrefix + rpcName;
-                if (!defaultListableBeanFactory.containsBean(beanName)) {
-                    log.info("Found JSON-RPC-Servicer to proxy [{}], bean name: {}.", className, beanName);
-                    defaultListableBeanFactory.registerSingleton(beanName, rpcService);
-                }
-            });
+            String aliasBeanName = rpcPrefix + rpcName;
+            if (!defaultListableBeanFactory.containsBean(aliasBeanName)) {
+                log.info("Found JSON-RPC-Servicer to proxy [{}], bean name: {}.", className, aliasBeanName);
+                defaultListableBeanFactory.registerSingleton(aliasBeanName, rpcService);
+            }
         }
     }
 }
