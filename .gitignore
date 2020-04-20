@@ -3,5 +3,3 @@
 .DS_Store
 logs/
 work/
-framework/src/main/resources/application-prod.properties
-framework/src/main/resources/application-dev.properties
