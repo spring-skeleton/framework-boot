@@ -255,6 +255,9 @@
 					<artifactId>maven-jar-plugin</artifactId>
 					<version>3.2.0</version>
 					<configuration>
+						<excludes>
+							<exclude>/application-*.properties</exclude>
+						</excludes>
 						<archive>
 							<manifest>
 								<addClasspath>true</addClasspath>
@@ -319,13 +322,13 @@
 											<include name="*.jar"/>
 										</fileset>
 									</copy>
-									<copy todir="${project.build.directory}/${project.name}" overwrite="true">
-										<fileset dir="${project.build.directory}">
-											<include name="${project.name}.jar"/>
+									<copy tofile="${project.build.directory}/${project.name}/${project.name}.jar" file="${project.build.directory}/${project.name}.jar" overwrite="true"/>
+									<mkdir dir="${project.build.directory}/${project.name}/config" />
+									<copy todir="${project.build.directory}/${project.name}/config" overwrite="true">
+										<fileset dir="src/main/resources">
+											<include name="application-*.properties"/>
 										</fileset>
 									</copy>
-									<mkdir dir="${project.build.directory}/${project.name}/config" />
-									<copy tofile="${project.build.directory}/${project.name}/config/application-prod.properties.dist" file="src/main/resources/application-dev.properties.dist" overwrite="true"></copy>
 								</tasks>
 							</configuration>
 						</execution>
@@ -334,7 +337,7 @@
 				<plugin>
 					<groupId>com.codeages</groupId>
 					<artifactId>generate-bin</artifactId>
-					<version>1.0.0-RELEASE</version>
+					<version>1.0.1-RELEASE</version>
 					<executions>
 						<execution>
 							<id>package</id>

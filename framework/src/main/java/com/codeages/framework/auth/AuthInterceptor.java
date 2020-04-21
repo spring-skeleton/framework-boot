@@ -1,7 +1,9 @@
 package com.codeages.framework.auth;
 
 import com.codeages.framework.exception.AccessDeniedException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -9,10 +11,14 @@ import org.springframework.web.servlet.ModelAndView;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+@Slf4j
 public class AuthInterceptor implements HandlerInterceptor {
 
     @Autowired
     private AuthService authService;
+
+    @Value("${auth.token.name}")
+    private String tokenName;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -26,9 +32,9 @@ public class AuthInterceptor implements HandlerInterceptor {
             return true;
         }
 
-        String authToken = request.getHeader("Authorization");
+        String authToken = request.getHeader(tokenName);
         if (authToken == null) {
-            throw new AccessDeniedException("No Authorization Header Token");
+            throw new AccessDeniedException(String.format("No %s Header Token", tokenName));
         }
 
         Boolean result = checkAuthorization(authToken);
@@ -52,9 +58,9 @@ public class AuthInterceptor implements HandlerInterceptor {
 
     private Boolean checkAuthorization(String authToken) {
         try {
-            authService.verify(authToken);
-            return true;
+            return authService.verify(authToken);
         } catch (Exception e) {
+            log.error(e.getMessage());
             return false;
         }
     }

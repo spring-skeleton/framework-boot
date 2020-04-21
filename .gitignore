@@ -1,6 +1,5 @@
-/target
-/logs
 .DS_
 .idea/
 .DS_Store
-/src/main/resources/application-dev.properties
+logs/
+work/
