@@ -323,13 +323,13 @@
 											<include name="*.jar"/>
 										</fileset>
 									</copy>
-									<copy todir="${project.build.directory}/${project.name}" overwrite="true">
-										<fileset dir="${project.build.directory}">
-											<include name="${project.name}.jar"/>
+									<copy tofile="${project.build.directory}/${project.name}/${project.name}.jar" file="${project.build.directory}/${project.name}.jar" overwrite="true"/>
+									<mkdir dir="${project.build.directory}/${project.name}/config" />
+									<copy todir="${project.build.directory}/${project.name}/config" overwrite="true">
+										<fileset dir="src/main/resources">
+											<include name="application-*.properties"/>
 										</fileset>
 									</copy>
-									<mkdir dir="${project.build.directory}/${project.name}/config" />
-									<copy tofile="${project.build.directory}/${project.name}/config/application-prod.properties" file="src/main/resources/application-prod.properties" overwrite="true"></copy>
 								</tasks>
 							</configuration>
 						</execution>
