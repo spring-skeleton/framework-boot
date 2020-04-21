@@ -152,8 +152,7 @@ public class CacheConfig implements ApplicationRunner {
                 .entryTtl(ttl)
                 .prefixKeysWith(applicationName)
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(new StringRedisSerializer()))
-                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer))
-                .disableCachingNullValues();
+                .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(jackson2JsonRedisSerializer));
 
         return RedisCacheManager.builder(factory)
                 .cacheDefaults(config)
