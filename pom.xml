@@ -338,7 +338,7 @@
 				<plugin>
 					<groupId>com.codeages</groupId>
 					<artifactId>generate-bin</artifactId>
-					<version>1.0.1-RELEASE</version>
+					<version>1.0.2-RELEASE</version>
 					<executions>
 						<execution>
 							<id>package</id>
