@@ -14,15 +14,16 @@ import java.util.UUID;
 @Slf4j
 public class MeterConfig implements MeterRegistryCustomizer {
 
-    @Value("server.tomcat.port")
+    @Value("${server.port:8080}")
     private String port;
 
     @Override
     public void customize(MeterRegistry registry) {
         try {
             String hostAddress = InetAddress.getLocalHost().getHostAddress();
-            log.info("设置metrics实例id为ip:" + hostAddress);
-            registry.config().commonTags("instance-id", hostAddress + "-" + port);
+            String instanceId = hostAddress + "_" + port;
+            log.info("设置metrics实例id:" + instanceId);
+            registry.config().commonTags("instance-id", instanceId);
         } catch (UnknownHostException e) {
             String uuid = UUID.randomUUID().toString();
             registry.config().commonTags("instance-id", uuid);
