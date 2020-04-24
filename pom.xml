@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.codeages</groupId>
 	<artifactId>framework-boot</artifactId>
-	<version>1.0.1-RELEASE</version>
+	<version>0.0.2-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -136,13 +136,13 @@
 			<dependency>
 				<groupId>com.codeages</groupId>
 				<artifactId>framework</artifactId>
-				<version>1.0.1-RELEASE</version>
+				<version>0.0.2-SNAPSHOT</version>
 			</dependency>
 
 			<dependency>
 				<groupId>com.codeages</groupId>
 				<artifactId>test-framework</artifactId>
-				<version>1.0.1-RELEASE</version>
+				<version>0.0.2-SNAPSHOT</version>
 				<scope>test</scope>
 			</dependency>
 
