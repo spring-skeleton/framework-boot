@@ -19,3 +19,7 @@
 
 * 按需启动
 * sentry
+
+* 动态设置日志级别的命令
+* 日志中带上traceId，和jsonrpc的id结合
+* job线程加入minitor监控，包括执行时间较长的监控
