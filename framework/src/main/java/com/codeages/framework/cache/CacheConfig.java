@@ -78,17 +78,36 @@ public class CacheConfig implements ApplicationRunner {
         Object arg = joinPoint.getArgs()[0];
         log.debug("arg {}", arg.getClass().getName());
         if(BaseEntity.class.isAssignableFrom(arg.getClass())) {
-            List<byte[]> keyList = new ArrayList<byte[]>();
-            for (Map.Entry<String, List<String>> entry : classMethodsFieldsMap.get(className).entrySet()) {
-                StringBuffer key = new StringBuffer(applicationName).append(":").append(className).append(":").append(entry.getKey()).append(":");
-                key.append(this.generateKeyPartByFields(arg, entry.getValue()));
-                log.info("delete key {}", key.toString());
-                keyList.add(key.toString().getBytes());
-            }
+            BaseEntity entity = (BaseEntity) arg;
+            this.clearCacheByEntity(className, entity);
+        }
+    }
 
-            if(keyList.size()>0){
-                connectionFactory.getConnection().del(convertBytes(keyList));
+    @Autowired
+    private List<BaseRepository> repositories;
+
+    public void syncCache(Date startDate, Date endDate) throws Exception {
+        for (BaseRepository repository:repositories) {
+            String className = getTable(repository);
+            log.debug("sync cache, get repository class: {}", className);
+            List<BaseEntity> entities = repository.findByUpdatedTimeBetween(startDate, endDate);
+            for (BaseEntity entity: entities) {
+                clearCacheByEntity(className, entity);
             }
+        }
+    }
+
+    private void clearCacheByEntity(String className, BaseEntity entity) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        List<byte[]> keyList = new ArrayList<byte[]>();
+        for (Map.Entry<String, List<String>> entry : classMethodsFieldsMap.get(className).entrySet()) {
+            StringBuffer key = new StringBuffer(applicationName).append(":").append(className).append(":").append(entry.getKey()).append(":");
+            key.append(this.generateKeyPartByFields(entity, entry.getValue()));
+            log.info("delete key {}", key.toString());
+            keyList.add(key.toString().getBytes());
+        }
+
+        if(keyList.size()>0){
+            connectionFactory.getConnection().del(convertBytes(keyList));
         }
     }
 
@@ -159,7 +178,6 @@ public class CacheConfig implements ApplicationRunner {
                 .cacheDefaults(config)
                 .build();
     }
-
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
