@@ -22,7 +22,7 @@ public class CacheSyncJob extends AbstractJob {
 
     @Override
     public String getJobName() {
-        return null;
+        return "cache-sync";
     }
 
 
@@ -34,9 +34,8 @@ public class CacheSyncJob extends AbstractJob {
     @Override
     protected void executeInternal(JobExecutionContext jobExecutionContext) throws JobExecutionException {
         try {
-            Date start = new Date();
-            start.setTime(start.getTime()-internalTime*1000);
-            cacheConfig.syncCache(start, new Date());
+            Date now = new Date();
+            cacheConfig.syncCache(now.getTime()-internalTime*1000, now.getTime());
         } catch (Exception e) {
             log.error(e.getMessage());
         }

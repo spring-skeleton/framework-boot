@@ -4,7 +4,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.repository.NoRepositoryBean;
 
-import java.util.Date;
 import java.util.List;
 
 @NoRepositoryBean
@@ -15,5 +14,5 @@ public interface BaseRepository<T extends BaseEntity> extends JpaRepository<T, L
 
     public T getById(Long id);
 
-    List<BaseEntity> findByUpdatedTimeBetween(Date startDate, Date endDate);
+    List<BaseEntity> findByUpdatedTimeBetween(Long startTime, Long endTime);
 }

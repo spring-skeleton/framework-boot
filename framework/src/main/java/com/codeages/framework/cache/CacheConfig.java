@@ -50,6 +50,8 @@ public class CacheConfig implements ApplicationRunner {
     @Value("${spring.cache.redis.time-to-live}")
     private Duration ttl;
 
+    @Autowired(required = false)
+    private List<BaseRepository> repositories;
 
     @Autowired
     private RedisConnectionFactory connectionFactory;
@@ -83,16 +85,20 @@ public class CacheConfig implements ApplicationRunner {
         }
     }
 
-    @Autowired
-    private List<BaseRepository> repositories;
-
-    public void syncCache(Date startDate, Date endDate) throws Exception {
+    public void syncCache(Long startDate, Long endDate) throws Exception {
+        if(null == repositories || repositories.size() == 0) {
+            log.debug("no repository should be sync.");
+            return;
+        }
         for (BaseRepository repository:repositories) {
             String className = getTable(repository);
-            log.debug("sync cache, get repository class: {}", className);
-            List<BaseEntity> entities = repository.findByUpdatedTimeBetween(startDate, endDate);
-            for (BaseEntity entity: entities) {
-                clearCacheByEntity(className, entity);
+            if (classMethodsFieldsMap.containsKey(className)) {
+                log.debug("sync cache, get repository class: {} {} {}", className, startDate, endDate);
+                List<BaseEntity> entities = repository.findByUpdatedTimeBetween(startDate, endDate);
+                for (BaseEntity entity: entities) {
+                    log.debug("clear cache: entity {}, id {}", entity.getClass().getName(), entity.getId());
+                    clearCacheByEntity(className, entity);
+                }
             }
         }
     }
