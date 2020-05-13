@@ -7,8 +7,11 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
+import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -65,9 +68,17 @@ public class CacheConfig implements ApplicationRunner {
 
     }
 
-    @After("execution(public * com.codeages..*.*Repository.delete*(..))")
-    public void afterDelete(JoinPoint joinPoint) {
+    @Around("execution(public * com.codeages..*.*Repository.deleteById(..))")
+    public Object aroudDelete(ProceedingJoinPoint joinPoint) throws java.lang.Throwable {
+        Long id = (Long)joinPoint.getArgs()[0];
+        BaseRepository repository = (BaseRepository)joinPoint.getTarget();
+        BaseEntity entity = repository.getById(id);
 
+        Object result = joinPoint.proceed();
+
+        String className = getTable(joinPoint.getTarget());
+        this.clearCacheByEntity(className, entity);
+        return result;
     }
 
     @After("execution(public * com.codeages..*.*Repository.save*(..)) || execution(public * test.codeages..*.*Repository.save*(..))")
