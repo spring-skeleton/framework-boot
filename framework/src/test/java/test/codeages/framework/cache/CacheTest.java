@@ -44,6 +44,13 @@ public class CacheTest extends BaseTest {
 
     }
 
+    @Test
+    public void testGetOrg(){
+        saveMockOrg();
+        Org org1 = orgService.getById(2L);
+        Assert.assertNull(org1);
+    }
+
     protected void assertOrg(Org savedOrg, Org org1) {
         Assert.assertEquals(savedOrg.getName(),org1.getName());
         Assert.assertEquals(savedOrg.getCode(),org1.getCode());
