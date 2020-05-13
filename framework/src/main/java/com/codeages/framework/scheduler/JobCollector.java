@@ -1,6 +1,7 @@
 package com.codeages.framework.scheduler;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -15,8 +16,15 @@ public class JobCollector implements ApplicationRunner {
     @Autowired(required = false)
     private List<AbstractJob> jobs;
 
+    @Value("${scheduler.job.auto-start}")
+    private Boolean autoStart;
+
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        if(!autoStart){
+            return;
+        }
+
         if(jobs!=null){
             jobs.forEach(job -> {
                 if(!"".equals(job.getCron())) {
