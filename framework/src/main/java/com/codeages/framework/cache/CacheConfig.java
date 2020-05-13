@@ -11,7 +11,6 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Before;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -70,8 +69,8 @@ public class CacheConfig implements ApplicationRunner {
 
     @Around("execution(public * com.codeages..*.*Repository.deleteById(..))  || execution(public * test.codeages..*.*Repository.deleteById(..))")
     public Object aroudDelete(ProceedingJoinPoint joinPoint) throws Throwable {
-        String className = getTable(joinPoint.getTarget());
-        if("".equals(className)) {
+        String className = getEntityClassByRepository((BaseRepository)joinPoint.getTarget());
+        if(!isCachedEntity(className)) {
             return joinPoint.proceed();
         }
 
@@ -80,18 +79,16 @@ public class CacheConfig implements ApplicationRunner {
         BaseEntity entity = repository.getById(id);
 
         Object result = joinPoint.proceed();
-
         this.clearCacheByEntity(className, entity);
         return result;
     }
 
     @Around("execution(public * com.codeages..*.*Repository.save(..)) || execution(public * test.codeages..*.*Repository.save(..))")
     public Object aroudSave(ProceedingJoinPoint joinPoint) throws Throwable {
-        String className = getTable(joinPoint.getTarget());
-        if("".equals(className)) {
+        String className = getEntityClassByRepository((BaseRepository)joinPoint.getTarget());
+        if(!isCachedEntity(className)) {
             return joinPoint.proceed();
         }
-
 
         BaseEntity entity = (BaseEntity)joinPoint.getArgs()[0];
         if(null == entity.getId()) {
@@ -109,8 +106,8 @@ public class CacheConfig implements ApplicationRunner {
             return;
         }
         for (BaseRepository repository:repositories) {
-            String className = getTable(repository);
-            if (classMethodsFieldsMap.containsKey(className)) {
+            String className = getEntityClassByRepository(repository);
+            if (isCachedEntity(className)) {
                 log.debug("sync cache, get repository class: {} {} {}", className, startDate, endDate);
                 List<BaseEntity> entities = repository.findByUpdatedTimeBetween(startDate, endDate);
                 for (BaseEntity entity: entities) {
@@ -119,6 +116,10 @@ public class CacheConfig implements ApplicationRunner {
                 }
             }
         }
+    }
+
+    private boolean isCachedEntity(String className) {
+        return !"".equals(className) && classMethodsFieldsMap.containsKey(className);
     }
 
     private void clearCacheByEntity(String className, BaseEntity entity) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
@@ -162,14 +163,14 @@ public class CacheConfig implements ApplicationRunner {
         return new KeyGenerator() {
             @Override
             public Object generate(Object target, Method method, Object... params) {
-                StringBuffer key=new StringBuffer(":").append(getTable(target)).append(":").append(method.getName()).append(params.length).append(":");
+                StringBuffer key=new StringBuffer(":").append(getEntityClassByRepository((BaseRepository) target)).append(":").append(method.getName()).append(params.length).append(":");
                 Parameter[] parameters = method.getParameters();
                 Map<String, Object> paramsMap = new HashMap<>();
                 for (int i = 0; i<parameters.length; i++) {
                     paramsMap.put(parameters[i].getName(), params[i]);
                 }
 
-                List<String> fields = classMethodsFieldsMap.get(getTable(target)).get(method.getName() + params.length);
+                List<String> fields = classMethodsFieldsMap.get(getEntityClassByRepository((BaseRepository) target)).get(method.getName() + params.length);
 
                 for (int i = 0; i<fields.size(); i++) {
                     key.append(fields.get(i)).append(":").append(paramsMap.get(fields.get(i)));
@@ -254,13 +255,13 @@ public class CacheConfig implements ApplicationRunner {
                         }
                     });
 
-                    classMethodsFieldsMap.put(getTable(repository), methodFields);
+                    classMethodsFieldsMap.put(getEntityClassByRepository(repository), methodFields);
                 }
             });
         });
     }
 
-    private static String getTable(Object repository){
+    private static String getEntityClassByRepository(BaseRepository repository){
         if(classMap.containsKey(repository.getClass().getName())){
             return classMap.get(repository.getClass().getName());
         }
