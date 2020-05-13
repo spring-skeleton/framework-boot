@@ -68,32 +68,39 @@ public class CacheConfig implements ApplicationRunner {
 
     }
 
-    @Around("execution(public * com.codeages..*.*Repository.deleteById(..))")
-    public Object aroudDelete(ProceedingJoinPoint joinPoint) throws java.lang.Throwable {
+    @Around("execution(public * com.codeages..*.*Repository.deleteById(..))  || execution(public * test.codeages..*.*Repository.deleteById(..))")
+    public Object aroudDelete(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className = getTable(joinPoint.getTarget());
+        if("".equals(className)) {
+            return joinPoint.proceed();
+        }
+
         Long id = (Long)joinPoint.getArgs()[0];
         BaseRepository repository = (BaseRepository)joinPoint.getTarget();
         BaseEntity entity = repository.getById(id);
 
         Object result = joinPoint.proceed();
 
-        String className = getTable(joinPoint.getTarget());
         this.clearCacheByEntity(className, entity);
         return result;
     }
 
-    @After("execution(public * com.codeages..*.*Repository.save*(..)) || execution(public * test.codeages..*.*Repository.save*(..))")
-    public void afterSave(JoinPoint joinPoint) throws Exception{
+    @Around("execution(public * com.codeages..*.*Repository.save(..)) || execution(public * test.codeages..*.*Repository.save(..))")
+    public Object aroudSave(ProceedingJoinPoint joinPoint) throws Throwable {
         String className = getTable(joinPoint.getTarget());
         if("".equals(className)) {
-            return;
+            return joinPoint.proceed();
         }
 
-        Object arg = joinPoint.getArgs()[0];
-        log.debug("arg {}", arg.getClass().getName());
-        if(BaseEntity.class.isAssignableFrom(arg.getClass())) {
-            BaseEntity entity = (BaseEntity) arg;
-            this.clearCacheByEntity(className, entity);
+
+        BaseEntity entity = (BaseEntity)joinPoint.getArgs()[0];
+        if(null == entity.getId()) {
+            return joinPoint.proceed();
         }
+
+        Object result = joinPoint.proceed();
+        this.clearCacheByEntity(className, entity);
+        return result;
     }
 
     public void syncCache(Long startDate, Long endDate) throws Exception {
