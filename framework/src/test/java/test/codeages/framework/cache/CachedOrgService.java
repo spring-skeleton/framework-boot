@@ -5,6 +5,8 @@ import test.codeages.framework.biz.Org;
 public interface CachedOrgService {
     public Org getById(Long id);
 
+    public void deleteById(Long id);
+
     public Org save(Org org);
 
     public Org getByCodeAndName(String code, String name);

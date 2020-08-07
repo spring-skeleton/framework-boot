@@ -33,4 +33,8 @@ public class CachedOrgServiceImpl extends BaseService implements CachedOrgServic
     public int updateNameById(Long id, String name) {
         return orgRepository.updateNameById(id,name);
     }
+
+    public void deleteById(Long id){
+        orgRepository.deleteById(id);
+    }
 }

@@ -41,7 +41,22 @@ public class CacheTest extends BaseTest {
         assertOrg(savedOrg, org5);
 
         orgService.updateNameById(org5.getId(), "销售部");
+    }
 
+    @Test
+    public void testGetOrg(){
+        saveMockOrg();
+        Org org1 = orgService.getById(2L);
+        Assert.assertNull(org1);
+    }
+
+    @Test
+    public void testDelete(){
+        Org org = saveMockOrg();
+        Assert.assertNotNull(org);
+        orgService.deleteById(org.getId());
+        Org org1 = orgService.getById(org.getId());
+        Assert.assertNull(org1);
     }
 
     protected void assertOrg(Org savedOrg, Org org1) {

@@ -10,6 +10,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import test.codeages.framework.biz.Org;
 
+import javax.transaction.Transactional;
+
 public interface CachedOrgRepository extends BaseRepository<Org> {
     @Cache
     Org getById(Long id);
@@ -28,5 +30,6 @@ public interface CachedOrgRepository extends BaseRepository<Org> {
     @Caching(evict = {@CacheEvict(cacheNames = "default", allEntries = true)})
     @Modifying
     @Query("update Org set name=?2 where id=?1")
+    @Transactional
     public int updateNameById(Long id, String name);
 }

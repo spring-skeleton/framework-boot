@@ -71,6 +71,16 @@ public class ServiceTest extends BaseTest {
     }
 
     @Test
+    public void testByEmptyConditions() {
+        saveMockOrg();
+        Map<String, Object> conditions = new HashMap<>();
+        conditions.put("name", "");
+        Pageable pageable = PageRequest.of(1, 100);
+        orgService.findByConditions(conditions, pageable);
+        Assert.assertEquals(1, orgService.findByConditions(conditions, pageable).getTotalPages());
+    }
+
+    @Test
     public void testByLikeConditions() {
         saveMockOrg();
         Map<String, Object> conditions = new HashMap<>();

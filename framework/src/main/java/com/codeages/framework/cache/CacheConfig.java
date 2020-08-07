@@ -7,7 +7,9 @@ import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
+import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.After;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -50,6 +52,8 @@ public class CacheConfig implements ApplicationRunner {
     @Value("${spring.cache.redis.time-to-live}")
     private Duration ttl;
 
+    @Autowired(required = false)
+    private List<BaseRepository> repositories;
 
     @Autowired
     private RedisConnectionFactory connectionFactory;
@@ -63,32 +67,72 @@ public class CacheConfig implements ApplicationRunner {
 
     }
 
-    @After("execution(public * com.codeages..*.*Repository.delete*(..))")
-    public void afterDelete(JoinPoint joinPoint) {
-
-    }
-
-    @After("execution(public * com.codeages..*.*Repository.save*(..)) || execution(public * test.codeages..*.*Repository.save*(..))")
-    public void afterSave(JoinPoint joinPoint) throws Exception{
-        String className = getTable(joinPoint.getTarget());
-        if("".equals(className)) {
-            return;
+    @Around("execution(public * com.codeages..*.*Repository.deleteById(..))  || execution(public * test.codeages..*.*Repository.deleteById(..))")
+    public Object aroudDelete(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className = getEntityClassByRepository((BaseRepository)joinPoint.getTarget());
+        if(!isCachedEntity(className)) {
+            return joinPoint.proceed();
         }
 
-        Object arg = joinPoint.getArgs()[0];
-        log.debug("arg {}", arg.getClass().getName());
-        if(BaseEntity.class.isAssignableFrom(arg.getClass())) {
-            List<byte[]> keyList = new ArrayList<byte[]>();
-            for (Map.Entry<String, List<String>> entry : classMethodsFieldsMap.get(className).entrySet()) {
-                StringBuffer key = new StringBuffer(applicationName).append(":").append(className).append(":").append(entry.getKey()).append(":");
-                key.append(this.generateKeyPartByFields(arg, entry.getValue()));
-                log.info("delete key {}", key.toString());
-                keyList.add(key.toString().getBytes());
-            }
+        Long id = (Long)joinPoint.getArgs()[0];
+        BaseRepository repository = (BaseRepository)joinPoint.getTarget();
+        BaseEntity entity = repository.getById(id);
 
-            if(keyList.size()>0){
-                connectionFactory.getConnection().del(convertBytes(keyList));
+        Object result = joinPoint.proceed();
+        this.clearCacheByEntity(className, entity);
+        return result;
+    }
+
+    @Around("execution(public * com.codeages..*.*Repository.save(..)) || execution(public * test.codeages..*.*Repository.save(..))")
+    public Object aroudSave(ProceedingJoinPoint joinPoint) throws Throwable {
+        String className = getEntityClassByRepository((BaseRepository)joinPoint.getTarget());
+        if(!isCachedEntity(className)) {
+            return joinPoint.proceed();
+        }
+
+        BaseEntity entity = (BaseEntity)joinPoint.getArgs()[0];
+        if(null == entity.getId()) {
+            return joinPoint.proceed();
+        }
+
+        Object result = joinPoint.proceed();
+        this.clearCacheByEntity(className, entity);
+        return result;
+    }
+
+    public void syncCache(Long startDate, Long endDate) throws Exception {
+        if(null == repositories || repositories.size() == 0) {
+            log.debug("no repository should be sync.");
+            return;
+        }
+        for (BaseRepository repository:repositories) {
+            String className = getEntityClassByRepository(repository);
+            if (isCachedEntity(className)) {
+                log.debug("sync cache, get repository class: {} {} {}", className, startDate, endDate);
+                List<BaseEntity> entities = repository.findByUpdatedTimeBetween(startDate, endDate);
+                for (BaseEntity entity: entities) {
+                    log.debug("clear cache: entity {}, id {}", entity.getClass().getName(), entity.getId());
+                    clearCacheByEntity(className, entity);
+                }
             }
+        }
+    }
+
+    private boolean isCachedEntity(String className) {
+        return !"".equals(className) && classMethodsFieldsMap.containsKey(className);
+    }
+
+    private void clearCacheByEntity(String className, BaseEntity entity) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
+        List<byte[]> keyList = new ArrayList<byte[]>();
+        for (Map.Entry<String, List<String>> entry : classMethodsFieldsMap.get(className).entrySet()) {
+            StringBuffer key = new StringBuffer(applicationName).append(":").append(className).append(":").append(entry.getKey()).append(":");
+            key.append(this.generateKeyPartByFields(entity, entry.getValue()));
+            log.info("delete key {}", key.toString());
+            keyList.add(key.toString().getBytes());
+        }
+
+        if(keyList.size()>0){
+            connectionFactory.getConnection().del(convertBytes(keyList));
         }
     }
 
@@ -119,14 +163,14 @@ public class CacheConfig implements ApplicationRunner {
         return new KeyGenerator() {
             @Override
             public Object generate(Object target, Method method, Object... params) {
-                StringBuffer key=new StringBuffer(":").append(getTable(target)).append(":").append(method.getName()).append(params.length).append(":");
+                StringBuffer key=new StringBuffer(":").append(getEntityClassByRepository((BaseRepository) target)).append(":").append(method.getName()).append(params.length).append(":");
                 Parameter[] parameters = method.getParameters();
                 Map<String, Object> paramsMap = new HashMap<>();
                 for (int i = 0; i<parameters.length; i++) {
                     paramsMap.put(parameters[i].getName(), params[i]);
                 }
 
-                List<String> fields = classMethodsFieldsMap.get(getTable(target)).get(method.getName() + params.length);
+                List<String> fields = classMethodsFieldsMap.get(getEntityClassByRepository((BaseRepository) target)).get(method.getName() + params.length);
 
                 for (int i = 0; i<fields.size(); i++) {
                     key.append(fields.get(i)).append(":").append(paramsMap.get(fields.get(i)));
@@ -159,7 +203,6 @@ public class CacheConfig implements ApplicationRunner {
                 .cacheDefaults(config)
                 .build();
     }
-
 
     @Override
     public void run(ApplicationArguments args) throws Exception {
@@ -212,13 +255,13 @@ public class CacheConfig implements ApplicationRunner {
                         }
                     });
 
-                    classMethodsFieldsMap.put(getTable(repository), methodFields);
+                    classMethodsFieldsMap.put(getEntityClassByRepository(repository), methodFields);
                 }
             });
         });
     }
 
-    private static String getTable(Object repository){
+    private static String getEntityClassByRepository(BaseRepository repository){
         if(classMap.containsKey(repository.getClass().getName())){
             return classMap.get(repository.getClass().getName());
         }
