@@ -5,7 +5,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.codeages</groupId>
 	<artifactId>framework-boot</artifactId>
-	<version>1.0.6-RELEASE</version>
+	<version>1.0.7-RELEASE</version>
 	<packaging>pom</packaging>
 
 	<parent>
@@ -100,6 +100,12 @@
 			<version>3.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<version>2.2.0.RELEASE</version>
+		</dependency>
+
 		<!-- fix jdk9 -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -136,7 +142,7 @@
 			<dependency>
 				<groupId>com.codeages</groupId>
 				<artifactId>framework</artifactId>
-				<version>1.0.6-RELEASE</version>
+				<version>1.0.7-RELEASE</version>
 			</dependency>
 
 			<dependency>
