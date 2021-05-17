@@ -5,13 +5,13 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.codeages</groupId>
 	<artifactId>framework-boot</artifactId>
-	<version>1.0.6-RELEASE</version>
+	<version>1.0.7-RELEASE</version>
 	<packaging>pom</packaging>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.2.4.RELEASE</version>
+		<version>2.3.2.RELEASE</version>
 	</parent>
 
 	<modules>
@@ -100,6 +100,12 @@
 			<version>3.1</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.alibaba.cloud</groupId>
+			<artifactId>spring-cloud-starter-alibaba-nacos-discovery</artifactId>
+			<version>2.2.5.RELEASE</version>
+		</dependency>
+
 		<!-- fix jdk9 -->
 		<dependency>
 			<groupId>javax.xml.bind</groupId>
@@ -129,6 +135,11 @@
 			<scope>runtime</scope>
 			<optional>true</optional>
 		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>2.0.1.Final</version>
+		</dependency>
 	</dependencies>
 
 	<dependencyManagement>
@@ -136,7 +147,7 @@
 			<dependency>
 				<groupId>com.codeages</groupId>
 				<artifactId>framework</artifactId>
-				<version>1.0.6-RELEASE</version>
+				<version>1.0.7-RELEASE</version>
 			</dependency>
 
 			<dependency>
