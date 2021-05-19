@@ -18,7 +18,7 @@ public class RpcTest extends BaseTest {
     @Autowired
     private Rpc2Client rpc2Client;
 
-    @Test
+    @Test(expected = JsonRpcException.class)
     public void testRpc() {
         Assert.assertEquals("张三", rpc1Client.getUserNameByName("张三"));
         Assert.assertEquals("张三", rpc2Client.getUserNameByName("张三"));
