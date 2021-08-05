@@ -14,15 +14,20 @@ import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.InitializingBean;
+import org.springframework.cloud.client.discovery.DiscoveryClient;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.core.env.Environment;
+import org.springframework.cloud.client.ServiceInstance;
 
 import java.lang.reflect.Type;
 import java.text.DateFormat;
 import java.util.Base64;
 import java.util.Date;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.stream.Collectors;
 
 
 public class ClientProxy
@@ -37,12 +42,14 @@ public class ClientProxy
     private String server;
     private HttpClient client = new HttpClient();
     private Gson gson;
+    private DiscoveryClient discoveryClient;
 
-    public ClientProxy(String className, Map<String, Object> annotationAttrs) throws Throwable {
+    public ClientProxy(String className, Map<String, Object> annotationAttrs, DiscoveryClient discoveryClient) throws Throwable {
         this.clazz = Class.forName(className);
         this.path = annotationAttrs.get("name").toString();
         this.server = annotationAttrs.get("server").toString();
         this.gson = initGson();
+        this.discoveryClient = discoveryClient;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
@@ -63,7 +70,7 @@ public class ClientProxy
     }
 
     public Object invoke(MethodInvocation invocation) throws Throwable {
-        PostMethod httpMethod = new PostMethod(environment.getProperty(server));
+        PostMethod httpMethod = new PostMethod(getUri());
         httpMethod.addRequestHeader("Authorization", "Basic " + getBasicAuthorization());
         httpMethod.addRequestHeader("Content-type", "application/json");
 
@@ -112,6 +119,18 @@ public class ClientProxy
                 + environment.getProperty(server + ".password");
         byte[] auth = Base64.getEncoder().encode(userAndPassword.getBytes());
         return new String(auth);
+    }
+
+    private String getUri() {
+        try {
+            List<ServiceInstance> instances = discoveryClient.getInstances(environment.getProperty(server));
+            List<String> uris = instances.stream().map(instance -> instance.getUri().toString()).collect(Collectors.toList());
+            int index = ThreadLocalRandom.current().nextInt(uris.size());
+            String uri = uris.get(index);
+            return uri + "/jsonrpc.php";
+        } catch (Exception e) {
+            throw new JsonRpcException("注册中心调用异常" + e.getMessage());
+        }
     }
 
     public void afterPropertiesSet() {
